@@ -18,6 +18,8 @@ OFFSET_Y = 85
 GRID_SIZE = 480
 GRID_COUNT = 8
 GEM_SIZE = GRID_SIZE / GRID_COUNT
+SPELL_X = 500
+SPELL_Y = 200
 
 TOLERANCE = 5
 SKIP = 5
@@ -280,6 +282,8 @@ if __name__ == "__main__":
             for d in decisions:
                 print "Move gem (%d, %d) %s" % (d[0] + 1, d[1] + 1, DirectionToText[d[2]])
                 processDecision(d)
+                
+            autopy.mouse.move(SPELL_X, SPELL_Y)
             time.sleep(0.1)
         else:
             print "No decisions could be made"
