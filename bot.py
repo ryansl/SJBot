@@ -2,7 +2,9 @@ import sys
 import os
 import time
 import datetime
+import math
 import pyscreenshot as Img
+import autopy
 
 
 # TODO:
@@ -178,6 +180,38 @@ def makeDecisions(gems):
     return result
     
     
+# Control the mouse and use it to swap the gem for a decision
+def processDecision(decision):
+    if decision == None or not decision:
+        return
+        
+    # Compute the coordinates of the starting and ending clicks
+    x = int(math.floor(OFFSET_X + (decision[0] * GEM_SIZE) + (GEM_SIZE / 2)))
+    y = int(math.floor(OFFSET_Y + (decision[1] * GEM_SIZE) + (GEM_SIZE / 2)))
+    dx = 0
+    dy = 0
+    
+    if decision[2] == Up:       dy = -1
+    elif decision[2] == Down:   dy = 1
+    elif decision[2] == Left:   dx = -1
+    elif decision[2] == Right:  dx = 1
+    
+    dx *= GEM_SIZE
+    dy *= GEM_SIZE
+    
+    
+    # Move the mouse and perform the clicks
+    try:
+        autopy.mouse.move(x, y)
+        autopy.mouse.click()
+        time.sleep(0.05)
+        autopy.mouse.move(x + dx, y + dy)
+        autopy.mouse.click()
+        time.sleep(0.2)
+    except:
+        pass
+        
+    
 # Enable the bot (on UP keypress)            
 def enableBot():
     global Enabled
@@ -232,6 +266,8 @@ if __name__ == "__main__":
         if len(decisions) > 0:
             for d in decisions:
                 print "Move gem (%d, %d) %s" % (d[0] + 1, d[1] + 1, DirectionToText[d[2]])
+                processDecision(d)
+                
             time.sleep(0.5)
             
         else:
