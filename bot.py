@@ -238,8 +238,6 @@ if __name__ == "__main__":
     print "Welcome to the StarJeweled AutoBot"
     print "Press UP to start, or DOWN to stop"
     
-    time.sleep(1)
-    
     # Main application loop
     while True:
         if not Enabled:
