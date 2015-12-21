@@ -78,16 +78,16 @@ DirectionToText = {
 }
 
 
-# Given an image, outputs an NxN list of the gem colors 
+# Given an image, outputs an NxN list of the gem colors and the number of unknowns
 def imageToMap(image):
     if image is None or not image:
-        return None
+        return (None, 0)
         
     # Convert the image to a 2D list of RGB tuple values
     try:
         pixels = image.convert("RGB")
     except:
-        return None
+        return (None, 0)
         
         
     # Result to be returned (two-dimensional list)
@@ -306,7 +306,6 @@ if __name__ == "__main__":
         else:
             if lastDecision != None and (datetime.datetime.now() - lastDecision).seconds >= RESET_SECONDS:
                 autopy.key.tap("z")
-                time.sleep(1)
             print "No decisions could be made"
     
     
