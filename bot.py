@@ -145,10 +145,10 @@ def makeDecisions(gems):
     # Step 1: Find all pairs (adjacent gems)
     for y in range(GRID_COUNT):
         for x in range(GRID_COUNT):
-            if x < GRID_COUNT - 1 and gems[y][x] == gems[y][x + 1]:
+            if x < GRID_COUNT - 1 and gems[y][x] == gems[y][x + 1] and gems[y][x] != Unknown:
                 pairs.append(((x, y), (x + 1, y), Horizontal))
             
-            if y < GRID_COUNT - 1 and gems[y][x] == gems[y + 1][x]:
+            if y < GRID_COUNT - 1 and gems[y][x] == gems[y + 1][x] and gems[y][x] != Unknown:
                 pairs.append(((x, y), (x, y + 1), Vertical))
     
     
