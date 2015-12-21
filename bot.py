@@ -10,7 +10,6 @@ import autopy
 # OPTIMIZATION IDEAS:
 # 3. Eliminate operations on conflicting pairs -> make it so that all decisions will succeed
 # 4. Smarter pattern matching, prioritizing wider rows
-# 5. Press Z to reset the board when there are no more good matches
 
 # Configuration variables
 OFFSET_X = 930
@@ -24,6 +23,7 @@ SPELL_Y = 200
 TOLERANCE = 5
 SKIP = 5
 UNKNOWN_THRESHOLD = GRID_COUNT
+RESET_SECONDS = 3
 # ----------------------
 
 # Enabled flag
@@ -255,6 +255,7 @@ if __name__ == "__main__":
             time.sleep(0.2)
             continue
             
+        lastDecision = None
         before = datetime.datetime.now()
         grid = None
         
@@ -298,8 +299,14 @@ if __name__ == "__main__":
                 print "Move gem (%d, %d) %s" % (d[0] + 1, d[1] + 1, DirectionToText[d[2]])
                 processDecision(d)
                 
+            lastDecision = datetime.datetime.now()
             autopy.mouse.move(SPELL_X, SPELL_Y)
+            
+        # If there are no decisions and we haven't made a decision in 3 seconds, then reset the board
         else:
+            if lastDecision != None and (datetime.datetime.now() - lastDecision).seconds >= RESET_SECONDS:
+                autopy.key.tap("z")
+                time.sleep(1)
             print "No decisions could be made"
     
     
