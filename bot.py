@@ -5,6 +5,11 @@ import datetime
 import pyscreenshot as Img
 
 
+# TODO:
+# 1. Press Z if no decisions could be made, add a timeout as well
+# 2. On and off switch
+# 3. Smarter pattern matching, prioritizing wider rows
+
 # Configuration variables
 OFFSET_X = 930
 OFFSET_Y = 85
@@ -13,6 +18,9 @@ GRID_COUNT = 8
 GEM_SIZE = GRID_SIZE / GRID_COUNT
 TOLERANCE = 15
 # ----------------------
+
+# Enabled flag
+Enabled = True
 
 # Colors
 Unknown = 0
@@ -169,21 +177,68 @@ def makeDecisions(gems):
     
     return result
     
-                
+    
+# Enable the bot (on UP keypress)            
+def enableBot():
+    global Enabled
+    Enabled = True
+    print "enable"
+    
 
+# Disable the bot (on DOWN keypress)
+def disableBot():
+    global Enabled
+    Enabled = False
+    print "disable"
+    
+    
 # Main function, entrypoint of the application
 if __name__ == "__main__":
+    print "Welcome to the StarJeweled AutoBot"
+    print "Press UP to start, or DOWN to stop"
+    
     time.sleep(2)
     
-    before = datetime.datetime.now()
-    grid = Img.grab(bbox = (OFFSET_X, OFFSET_Y, OFFSET_X + GRID_SIZE, OFFSET_Y + GRID_SIZE))
-    gems = imageToMap(grid)
-    decisions = makeDecisions(gems)
+    # Main application loop
+    while True:
+        if not Enabled:
+            time.sleep(0.2)
+            continue
+            
+        before = datetime.datetime.now()
+        grid = None
+        
+        try:
+            grid = Img.grab(bbox = (OFFSET_X, OFFSET_Y, OFFSET_X + GRID_SIZE, OFFSET_Y + GRID_SIZE))
+        except:
+            grid = None
+            
+        if grid == None:
+            print "Error getting screen data"
+            continue
+            
+        gems = imageToMap(grid)
+        
+        if gems == None:
+            print "Error converting grid to gem map"
+            continue
+        
+        decisions = makeDecisions(gems)
+        
+        if decisions == None:
+            print "Error making decisions"
+            continue
     
-    for d in decisions:
-        print "Move gem (%d, %d) %s" % (d[0] + 1, d[1] + 1, DirectionToText[d[2]])
+        if len(decisions) > 0:
+            for d in decisions:
+                print "Move gem (%d, %d) %s" % (d[0] + 1, d[1] + 1, DirectionToText[d[2]])
+            time.sleep(0.5)
+            
+        else:
+            print "No decisions could be made"
     
-    after = datetime.datetime.now()
-    seconds = (after - before).microseconds / 1e6
+        after = datetime.datetime.now()
+        seconds = (after - before).microseconds / 1e6
     
-    print "Finished in %f seconds" % (seconds)
+        print "Finished computation in %f seconds" % (seconds)
+        time.sleep(0.1)
