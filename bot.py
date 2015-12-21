@@ -138,36 +138,34 @@ def makeDecisions(gems):
     for y in range(GRID_COUNT):
         for x in range(GRID_COUNT):
             if x < GRID_COUNT - 1 and gems[y][x] == gems[y][x + 1]:
-                pairs.append(((x, y), (x + 1, y), HORIZONTAL))
+                pairs.append(((x, y), (x + 1, y), Horizontal))
             
             if y < GRID_COUNT - 1 and gems[y][x] == gems[y + 1][x]:
-                pairs.append(((x, y), (x, y + 1), VERTICAL))
-                
-        pairs.append(row)
+                pairs.append(((x, y), (x, y + 1), Vertical))
     
     
     # Step 2: For each pair, if there is a gem that can fill it in, then add it to the decision list
     for pair in pairs:
-        x = pairs[0][0]             # Top/Left gem
-        y = pairs[0][1]
-        j = pairs[1][0]             # Bottom/Right gem
-        k = pairs[1][1]
+        x = pair[0][0]             # Top/Left gem
+        y = pair[0][1]
+        j = pair[1][0]             # Bottom/Right gem
+        k = pair[1][1]
         
-        if pairs[2] == HORIZONTAL:
-            if x > 0 and y > 0 and gems[y - 1][x - 1] == gems[y][x]:                          result.append((x - 1, y - 1, DOWN))   # NW of left
-            if x > 0 and y < GRID_COUNT - 1 and gems[y + 1][x - 1] == gems[y][x]:              result.append(x - 1, y + 1, UP)       # SW of left
-            if x >= 2 and gems[y][x - 2] == gems[y][x]:                                       result.append(x - 2, y, RIGHT)        # W of left
-            if j < GRID_COUNT - 1 and k > 0 and gems[k - 1][j + 1] == gems[k][j]:              result.append(j + 1, k - 1, DOWN)     # NE of right
-            if j < GRID_COUNT - 1 and k < GRID_COUNT - 1 and gems[k + 1][j + 1] == gems[k][j]:  results.append(j + 1, k + 1, UP)      # SE of right
-            if j < GRID_COUNT - 2 and gems[k][j + 2] == gems[k][j]:                            results.append(j + 2, k, LEFT)        # E of right
+        if pair[2] == Horizontal:
+            if x > 0 and y > 0 and gems[y - 1][x - 1] == gems[y][x]:                            result.append((x - 1, y - 1, Down))     # NW of left
+            if x > 0 and y < GRID_COUNT - 1 and gems[y + 1][x - 1] == gems[y][x]:               result.append((x - 1, y + 1, Up))       # SW of left
+            if x >= 2 and gems[y][x - 2] == gems[y][x]:                                         result.append((x - 2, y, Right))        # W of left
+            if j < GRID_COUNT - 1 and k > 0 and gems[k - 1][j + 1] == gems[k][j]:               result.append((j + 1, k - 1, Down))     # NE of right
+            if j < GRID_COUNT - 1 and k < GRID_COUNT - 1 and gems[k + 1][j + 1] == gems[k][j]:  result.append((j + 1, k + 1, Up))       # SE of right
+            if j < GRID_COUNT - 2 and gems[k][j + 2] == gems[k][j]:                             result.append((j + 2, k, Left))         # E of right
             
-        elif pairs[2] == VERTICAL:
-            if y > 0 and x > 0 and gems[y - 1][x - 1] == gems[y][x]:                          results.append(x - 1, y - 1, RIGHT)   # NW of top
-            if y > 0 and x < GRID_COUNT - 1 and gems[y - 1][x + 1] == gems[y][x]:              results.append(x + 1, y - 1, LEFT)    # NE of top
-            if y >= 2 and gems[y - 2][x] == gems[y][x]:                                       results.append(x, y - 2, DOWN)        # N of top
-            if k < GRID_COUNT - 1 and j > 0 and gems[k + 1][j - 1] == gems[k][j]:              results.append(j - 1, k + 1, RIGHT)   # SW of bottom
-            if k < GRID_COUNT - 1 and j < GRID_COUNT - 1 and gems[k + 1][j + 1] == gems[k][j]:  results.append(j + 1, k + 1, LEFT)    # SE of bottom
-            if k < GRID_COUNT - 2 and gems[k - 2][j] == gems[k][j]:                            results.append(j, k - 2, UP)          # S of bottom
+        elif pair[2] == Vertical:
+            if y > 0 and x > 0 and gems[y - 1][x - 1] == gems[y][x]:                            result.append((x - 1, y - 1, Right))    # NW of top
+            if y > 0 and x < GRID_COUNT - 1 and gems[y - 1][x + 1] == gems[y][x]:               result.append((x + 1, y - 1, Left))     # NE of top
+            if y >= 2 and gems[y - 2][x] == gems[y][x]:                                         result.append((x, y - 2, Down))         # N of top
+            if k < GRID_COUNT - 1 and j > 0 and gems[k + 1][j - 1] == gems[k][j]:               result.append((j - 1, k + 1, Right))    # SW of bottom
+            if k < GRID_COUNT - 1 and j < GRID_COUNT - 1 and gems[k + 1][j + 1] == gems[k][j]:  result.append((j + 1, k + 1, Left))     # SE of bottom
+            if k < GRID_COUNT - 2 and gems[k - 2][j] == gems[k][j]:                             result.append((j, k - 2, Up))           # S of bottom
     
     return result
     
