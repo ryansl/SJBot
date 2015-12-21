@@ -7,13 +7,10 @@ import pyscreenshot as Img
 import autopy
 
 
-# TODO:
-# 1. Press Z if no decisions could be made, add a timeout as well
-# 2. On and off switch
-# 3. Smarter pattern matching, prioritizing wider rows
-
 # OPTIMIZATION IDEAS:
 # 3. Eliminate operations on conflicting pairs -> make it so that all decisions will succeed
+# 4. Smarter pattern matching, prioritizing wider rows
+# 5. Make room for spell casting
 
 # Configuration variables
 OFFSET_X = 930
