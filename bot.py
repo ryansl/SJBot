@@ -1,0 +1,191 @@
+import sys
+import os
+import time
+import datetime
+import pyscreenshot as Img
+
+
+# Configuration variables
+OFFSET_X = 930
+OFFSET_Y = 85
+GRID_SIZE = 480
+GRID_COUNT = 8
+GEM_SIZE = GRID_SIZE / GRID_COUNT
+TOLERANCE = 15
+# ----------------------
+
+# Colors
+Unknown = 0
+White = 1
+Red = 2
+Blue = 3
+Purple = 4
+Green = 5
+Yellow = 6
+
+# Directions
+Left = 1
+Right = 2
+Up = 3
+Down = 4
+
+# Pair Orientations
+Horizontal = 1
+Vertical = 2
+
+# Gem color index to RGB average value
+GemToColor = {
+     1 : (76, 74, 72),
+     2 : (110, 41, 22),
+     3 : (69, 141, 173),
+     4 : (67, 34, 72),
+     5 : (68, 126, 38),
+     6 : (111, 110, 53)
+}
+
+# Gem color index to text
+ColorToText = {
+    0 : "?????",
+    1 : "White",
+    2 : "Red",
+    3 : "Blue",
+    4 : "Purple",
+    5 : "Green",
+    6 : "Yellow"
+}
+
+# Direction to text
+DirectionToText = {
+    1: "Left",
+    2: "Right",
+    3: "Up",
+    4: "Down"
+}
+
+
+# Given an image, outputs an NxN list of the gem colors 
+def imageToMap(image):
+    if image is None or not image:
+        return None
+        
+    # Convert the image to a 2D list of RGB tuple values
+    try:
+        pixels = image.convert("RGB")
+    except:
+        return None
+        
+        
+    # Result to be returned (two-dimensional list)
+    result = []
+        
+    
+    # Go through each cell (every gem location) and process it
+    for y in range(GRID_COUNT):
+        row = []
+        
+        for x in range(GRID_COUNT):
+            totalRed = 0
+            totalGreen = 0
+            totalBlue = 0
+            baseX = x * GEM_SIZE
+            baseY = y * GEM_SIZE
+            sampleCount = GEM_SIZE * GEM_SIZE           # Need to change this value if we change the range increment
+            gemColor = Unknown
+            
+            
+            # Take the average of all the pixel values in the gem area
+            for py in range(GEM_SIZE):
+                for px in range(GEM_SIZE):
+                    rgb = pixels.getpixel((baseX + px, baseY + py))
+                    totalRed += rgb[0]
+                    totalGreen += rgb[1]
+                    totalBlue += rgb[2]
+            average = (totalRed / sampleCount, totalGreen / sampleCount, totalBlue / sampleCount)
+            
+            
+            # Use the average to predict the color of this gem
+            for color, rgb in GemToColor.iteritems():
+                test = [abs(rgb[index] - average[index]) <= TOLERANCE for index in range(3)]
+                if test[0] == True and test[1] == True and test[2] == True:
+                    gemColor = color
+                    break
+                    
+            row.append(gemColor)
+        result.append(row)
+        
+        
+    # We are done!
+    return result
+    
+    
+# Convert a 2D map of colors to their text equivalents
+def mapColorToText(colors):
+    if colors == None or not colors:
+        return None
+        
+    return [[ColorToText[color] for color in row] for row in colors]
+    
+    
+# Given a map of gem colors, decides the set of gems to move (multiple possible) and return them as [(x, y, DIRECTION), ...]
+def makeDecisions(gems):
+    if gems == None or not gems:
+        return None
+        
+    result = []
+    pairs = []
+    
+    # Step 1: Find all pairs (adjacent gems)
+    for y in range(GRID_COUNT):
+        for x in range(GRID_COUNT):
+            if x < GRID_COUNT - 1 and gems[y][x] == gems[y][x + 1]:
+                pairs.append(((x, y), (x + 1, y), HORIZONTAL))
+            
+            if y < GRID_COUNT - 1 and gems[y][x] == gems[y + 1][x]:
+                pairs.append(((x, y), (x, y + 1), VERTICAL))
+                
+        pairs.append(row)
+    
+    
+    # Step 2: For each pair, if there is a gem that can fill it in, then add it to the decision list
+    for pair in pairs:
+        x = pairs[0][0]             # Top/Left gem
+        y = pairs[0][1]
+        j = pairs[1][0]             # Bottom/Right gem
+        k = pairs[1][1]
+        
+        if pairs[2] == HORIZONTAL:
+            if x > 0 and y > 0 and gems[y - 1][x - 1] == gems[y][x]:                          result.append((x - 1, y - 1, DOWN))   # NW of left
+            if x > 0 and y < GRID_COUNT - 1 and gems[y + 1][x - 1] == gems[y][x]:              result.append(x - 1, y + 1, UP)       # SW of left
+            if x >= 2 and gems[y][x - 2] == gems[y][x]:                                       result.append(x - 2, y, RIGHT)        # W of left
+            if j < GRID_COUNT - 1 and k > 0 and gems[k - 1][j + 1] == gems[k][j]:              result.append(j + 1, k - 1, DOWN)     # NE of right
+            if j < GRID_COUNT - 1 and k < GRID_COUNT - 1 and gems[k + 1][j + 1] == gems[k][j]:  results.append(j + 1, k + 1, UP)      # SE of right
+            if j < GRID_COUNT - 2 and gems[k][j + 2] == gems[k][j]:                            results.append(j + 2, k, LEFT)        # E of right
+            
+        elif pairs[2] == VERTICAL:
+            if y > 0 and x > 0 and gems[y - 1][x - 1] == gems[y][x]:                          results.append(x - 1, y - 1, RIGHT)   # NW of top
+            if y > 0 and x < GRID_COUNT - 1 and gems[y - 1][x + 1] == gems[y][x]:              results.append(x + 1, y - 1, LEFT)    # NE of top
+            if y >= 2 and gems[y - 2][x] == gems[y][x]:                                       results.append(x, y - 2, DOWN)        # N of top
+            if k < GRID_COUNT - 1 and j > 0 and gems[k + 1][j - 1] == gems[k][j]:              results.append(j - 1, k + 1, RIGHT)   # SW of bottom
+            if k < GRID_COUNT - 1 and j < GRID_COUNT - 1 and gems[k + 1][j + 1] == gems[k][j]:  results.append(j + 1, k + 1, LEFT)    # SE of bottom
+            if k < GRID_COUNT - 2 and gems[k - 2][j] == gems[k][j]:                            results.append(j, k - 2, UP)          # S of bottom
+    
+    return result
+    
+                
+
+# Main function, entrypoint of the application
+if __name__ == "__main__":
+    time.sleep(2)
+    
+    before = datetime.datetime.now()
+    grid = Img.grab(bbox = (OFFSET_X, OFFSET_Y, OFFSET_X + GRID_SIZE, OFFSET_Y + GRID_SIZE))
+    gems = imageToMap(grid)
+    decisions = makeDecisions(gems)
+    
+    for d in decisions:
+        print "Move gem (%d, %d) %s" % (d[0] + 1, d[1] + 1, DirectionToText[d[2]])
+    
+    after = datetime.datetime.now()
+    seconds = (after - before).microseconds / 1e6
+    
+    print "Finished in %f seconds" % (seconds)
