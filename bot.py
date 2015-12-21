@@ -13,8 +13,6 @@ import autopy
 # 3. Smarter pattern matching, prioritizing wider rows
 
 # OPTIMIZATION IDEAS:
-# 1. Speed up the conversion (image to map) rate
-# 2. If there are too many unknowns, throw out the map and generate a new one
 # 3. Eliminate operations on conflicting pairs -> make it so that all decisions will succeed
 
 # Configuration variables
@@ -23,7 +21,10 @@ OFFSET_Y = 85
 GRID_SIZE = 480
 GRID_COUNT = 8
 GEM_SIZE = GRID_SIZE / GRID_COUNT
-TOLERANCE = 15
+
+TOLERANCE = 5
+SKIP = 5
+UNKNOWN_THRESHOLD = GRID_COUNT
 # ----------------------
 
 # Enabled flag
@@ -50,12 +51,12 @@ Vertical = 2
 
 # Gem color index to RGB average value
 GemToColor = {
-     1 : (76, 74, 72),
-     2 : (110, 41, 22),
-     3 : (69, 141, 173),
-     4 : (67, 34, 72),
-     5 : (68, 126, 38),
-     6 : (111, 110, 53)
+     1 : (15, 14, 14),
+     2 : (21, 7, 4),
+     3 : (14, 28, 35),
+     4 : (15, 8, 17),
+     5 : (13, 25, 7),
+     6 : (22, 22, 10)
 }
 
 # Gem color index to text
@@ -92,6 +93,7 @@ def imageToMap(image):
         
     # Result to be returned (two-dimensional list)
     result = []
+    unknownCount = 0
         
     
     # Go through each cell (every gem location) and process it
@@ -104,13 +106,13 @@ def imageToMap(image):
             totalBlue = 0
             baseX = x * GEM_SIZE
             baseY = y * GEM_SIZE
-            sampleCount = GEM_SIZE * GEM_SIZE           # Need to change this value if we change the range increment
+            sampleCount = GEM_SIZE * GEM_SIZE / SKIP
             gemColor = Unknown
             
             
             # Take the average of all the pixel values in the gem area
-            for py in range(GEM_SIZE):
-                for px in range(GEM_SIZE):
+            for py in range(0, GEM_SIZE, SKIP):
+                for px in range(0, GEM_SIZE, SKIP):
                     rgb = pixels.getpixel((baseX + px, baseY + py))
                     totalRed += rgb[0]
                     totalGreen += rgb[1]
@@ -125,12 +127,17 @@ def imageToMap(image):
                     gemColor = color
                     break
                     
+            
+            # If the color is still unknown, then record it
+            if gemColor == Unknown:
+                unknownCount += 1
+                
             row.append(gemColor)
         result.append(row)
         
         
     # We are done!
-    return result
+    return (result, unknownCount)
     
     
 # Convert a 2D map of colors to their text equivalents
@@ -219,14 +226,12 @@ def processDecision(decision):
 def enableBot():
     global Enabled
     Enabled = True
-    print "enable"
     
 
 # Disable the bot (on DOWN keypress)
 def disableBot():
     global Enabled
     Enabled = False
-    print "disable"
     
     
 # Main function, entrypoint of the application
@@ -234,7 +239,7 @@ if __name__ == "__main__":
     print "Welcome to the StarJeweled AutoBot"
     print "Press UP to start, or DOWN to stop"
     
-    time.sleep(2)
+    time.sleep(1)
     
     # Main application loop
     while True:
@@ -245,37 +250,45 @@ if __name__ == "__main__":
         before = datetime.datetime.now()
         grid = None
         
+        
+        # Get the screen data
         try:
             grid = Img.grab(bbox = (OFFSET_X, OFFSET_Y, OFFSET_X + GRID_SIZE, OFFSET_Y + GRID_SIZE))
         except:
-            grid = None
-            
+            grid = None  
         if grid == None:
             print "Error getting screen data"
             continue
             
-        gems = imageToMap(grid)
         
+        # Convert it to a gem map
+        (gems, unknownCount) = imageToMap(grid)
         if gems == None:
             print "Error converting grid to gem map"
             continue
+        if unknownCount >= UNKNOWN_THRESHOLD:
+            print "Found %d unknowns, skipping because there are too many" % (unknownCount)
+            continue
         
+        
+        # Build a set of decisions
         decisions = makeDecisions(gems)
-        
         if decisions == None:
             print "Error making decisions"
             continue
     
+    
+        # Process the decisions
         if len(decisions) > 0:
             for d in decisions:
                 print "Move gem (%d, %d) %s" % (d[0] + 1, d[1] + 1, DirectionToText[d[2]])
                 processDecision(d)
-                time.sleep(0.05)
-            
+            time.sleep(0.1)
         else:
             print "No decisions could be made"
     
+    
+        # Benchmarking for testing purposes
         after = datetime.datetime.now()
         seconds = (after - before).microseconds / 1e6
-    
         print "Finished computation in %f seconds" % (seconds)
