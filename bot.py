@@ -12,6 +12,11 @@ import autopy
 # 2. On and off switch
 # 3. Smarter pattern matching, prioritizing wider rows
 
+# OPTIMIZATION IDEAS:
+# 1. Speed up the conversion (image to map) rate
+# 2. If there are too many unknowns, throw out the map and generate a new one
+# 3. Eliminate operations on conflicting pairs -> make it so that all decisions will succeed
+
 # Configuration variables
 OFFSET_X = 930
 OFFSET_Y = 85
@@ -204,10 +209,8 @@ def processDecision(decision):
     try:
         autopy.mouse.move(x, y)
         autopy.mouse.click()
-        time.sleep(0.05)
         autopy.mouse.move(x + dx, y + dy)
         autopy.mouse.click()
-        time.sleep(0.2)
     except:
         pass
         
@@ -267,8 +270,7 @@ if __name__ == "__main__":
             for d in decisions:
                 print "Move gem (%d, %d) %s" % (d[0] + 1, d[1] + 1, DirectionToText[d[2]])
                 processDecision(d)
-                
-            time.sleep(0.5)
+                time.sleep(0.05)
             
         else:
             print "No decisions could be made"
@@ -277,4 +279,3 @@ if __name__ == "__main__":
         seconds = (after - before).microseconds / 1e6
     
         print "Finished computation in %f seconds" % (seconds)
-        time.sleep(0.1)
