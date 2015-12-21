@@ -10,7 +10,7 @@ import autopy
 # OPTIMIZATION IDEAS:
 # 3. Eliminate operations on conflicting pairs -> make it so that all decisions will succeed
 # 4. Smarter pattern matching, prioritizing wider rows
-# 5. Make room for spell casting
+# 5. Press Z to reset the board when there are no more good matches
 
 # Configuration variables
 OFFSET_X = 930
@@ -201,21 +201,32 @@ def processDecision(decision):
     y = int(math.floor(OFFSET_Y + (decision[1] * GEM_SIZE) + (GEM_SIZE / 2)))
     dx = 0
     dy = 0
+    tx = 0
+    ty = 0
     
     if decision[2] == Up:       dy = -1
     elif decision[2] == Down:   dy = 1
     elif decision[2] == Left:   dx = -1
     elif decision[2] == Right:  dx = 1
     
-    dx *= GEM_SIZE
-    dy *= GEM_SIZE
+    tx = x + (dx * GEM_SIZE)
+    ty = y + (dy * GEM_SIZE)
+    
+    
+    # If the starting or ending mouse position is not in the grid, then don't try to move
+    # NOTE: Exceptions are really expensive! They cost about 100ms of time
+    w = OFFSET_X + GRID_SIZE
+    h = OFFSET_Y + GRID_SIZE
+    
+    if x < OFFSET_X or y < OFFSET_Y or tx < OFFSET_X or ty < OFFSET_Y or x > w or y > h or tx > w or ty > h:
+        return
     
     
     # Move the mouse and perform the clicks
     try:
         autopy.mouse.move(x, y)
         autopy.mouse.click()
-        autopy.mouse.move(x + dx, y + dy)
+        autopy.mouse.move(tx, ty)
         autopy.mouse.click()
     except:
         pass
@@ -252,17 +263,23 @@ if __name__ == "__main__":
         try:
             grid = Img.grab(bbox = (OFFSET_X, OFFSET_Y, OFFSET_X + GRID_SIZE, OFFSET_Y + GRID_SIZE))
         except:
-            grid = None  
+            grid = None
+            
         if grid == None:
             print "Error getting screen data"
             continue
             
         
         # Convert it to a gem map
-        (gems, unknownCount) = imageToMap(grid)
+        try:
+            (gems, unknownCount) = imageToMap(grid)
+        except:
+            gems = None
+            
         if gems == None:
             print "Error converting grid to gem map"
             continue
+            
         if unknownCount >= UNKNOWN_THRESHOLD:
             print "Found %d unknowns, skipping because there are too many" % (unknownCount)
             continue
@@ -282,7 +299,6 @@ if __name__ == "__main__":
                 processDecision(d)
                 
             autopy.mouse.move(SPELL_X, SPELL_Y)
-            time.sleep(0.1)
         else:
             print "No decisions could be made"
     
