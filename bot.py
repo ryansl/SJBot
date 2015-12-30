@@ -278,6 +278,7 @@ if __name__ == "__main__":
         lastDecision = None
         before = datetime.datetime.now()
         grid = None
+        prevDecision = None
         
         
         # Get the screen data
@@ -314,12 +315,13 @@ if __name__ == "__main__":
     
     
         # Process the decisions
-        if len(decisions) > 0:
+        if len(decisions) > 0 and decisions != prevDecision:
             for d in decisions:
                 print "Move gem (%d, %d) %s" % (d[0] + 1, d[1] + 1, DirectionToText[d[2]])
                 processDecision(d)
                 
             lastDecision = datetime.datetime.now()
+            prevDecision = decisions
             autopy.mouse.move(SPELL_X, SPELL_Y)
             
         # If there are no decisions and we haven't made a decision in 3 seconds, then reset the board
