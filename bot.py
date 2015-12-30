@@ -173,25 +173,25 @@ def makeDecisions(gems):
         k = pair[1][1]
         
         # Prioritize vertical clears over horizontal clears
-        if pair[2] == Horizontal:
-            if x > 0 and y > 0 and gems[y - 1][x - 1] == gems[y][x]:                            result.append((x - 1, y - 1, Down))     # NW of left
-            if x > 0 and y < GRID_COUNT - 1 and gems[y + 1][x - 1] == gems[y][x]:               result.append((x - 1, y + 1, Up))       # SW of left
-            if j < GRID_COUNT - 1 and k > 0 and gems[k - 1][j + 1] == gems[k][j]:               result.append((j + 1, k - 1, Down))     # NE of right
-            if j < GRID_COUNT - 1 and k < GRID_COUNT - 1 and gems[k + 1][j + 1] == gems[k][j]:  result.append((j + 1, k + 1, Up))       # SE of right
-        
         if pair[2] == Vertical:
             if y >= 2 and gems[y - 2][x] == gems[y][x]:                                         result.append((x, y - 2, Down))         # N of top
             if k < GRID_COUNT - 2 and gems[k + 2][j] == gems[k][j]:                             result.append((j, k + 2, Up))           # S of bottom
-        
-        if pair[2] == Horizontal:
-            if x >= 2 and gems[y][x - 2] == gems[y][x]:                                         result.append((x - 2, y, Right))        # W of left
-            if j < GRID_COUNT - 2 and gems[k][j + 2] == gems[k][j]:                             result.append((j + 2, k, Left))         # E of right
             
         if pair[2] == Vertical:
             if y > 0 and x > 0 and gems[y - 1][x - 1] == gems[y][x]:                            result.append((x - 1, y - 1, Right))    # NW of top
             if y > 0 and x < GRID_COUNT - 1 and gems[y - 1][x + 1] == gems[y][x]:               result.append((x + 1, y - 1, Left))     # NE of top
             if k < GRID_COUNT - 1 and j > 0 and gems[k + 1][j - 1] == gems[k][j]:               result.append((j - 1, k + 1, Right))    # SW of bottom
             if k < GRID_COUNT - 1 and j < GRID_COUNT - 1 and gems[k + 1][j + 1] == gems[k][j]:  result.append((j + 1, k + 1, Left))     # SE of bottom
+            
+        if pair[2] == Horizontal:
+            if x > 0 and y > 0 and gems[y - 1][x - 1] == gems[y][x]:                            result.append((x - 1, y - 1, Down))     # NW of left
+            if x > 0 and y < GRID_COUNT - 1 and gems[y + 1][x - 1] == gems[y][x]:               result.append((x - 1, y + 1, Up))       # SW of left
+            if j < GRID_COUNT - 1 and k > 0 and gems[k - 1][j + 1] == gems[k][j]:               result.append((j + 1, k - 1, Down))     # NE of right
+            if j < GRID_COUNT - 1 and k < GRID_COUNT - 1 and gems[k + 1][j + 1] == gems[k][j]:  result.append((j + 1, k + 1, Up))       # SE of right
+            
+        if pair[2] == Horizontal:
+            if x >= 2 and gems[y][x - 2] == gems[y][x]:                                         result.append((x - 2, y, Right))        # W of left
+            if j < GRID_COUNT - 2 and gems[k][j + 2] == gems[k][j]:                             result.append((j + 2, k, Left))         # E of right
 
     
     # Step 3: Eliminate decisions that could potentially conflict with each other
