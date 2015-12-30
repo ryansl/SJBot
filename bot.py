@@ -181,7 +181,7 @@ def makeDecisions(gems):
         
         if pair[2] == Vertical:
             if y >= 2 and gems[y - 2][x] == gems[y][x]:                                         result.append((x, y - 2, Down))         # N of top
-            if k < GRID_COUNT - 2 and gems[k - 2][j] == gems[k][j]:                             result.append((j, k - 2, Up))           # S of bottom
+            if k < GRID_COUNT - 2 and gems[k + 2][j] == gems[k][j]:                             result.append((j, k + 2, Up))           # S of bottom
         
         if pair[2] == Horizontal:
             if x >= 2 and gems[y][x - 2] == gems[y][x]:                                         result.append((x - 2, y, Right))        # W of left
