@@ -47,6 +47,8 @@ Down = 4
 # Pair Orientations
 Horizontal = 1
 Vertical = 2
+GapHorizontal = 3
+GapVertical = 4
 
 # Gem color index to RGB average value
 GemToColor = {
@@ -158,11 +160,20 @@ def makeDecisions(gems):
     # Step 1: Find all pairs (adjacent gems)
     for y in range(GRID_COUNT):
         for x in range(GRID_COUNT):
-            if x < GRID_COUNT - 1 and gems[y][x] == gems[y][x + 1] and gems[y][x] != Unknown:
+            if gems[y][x] == Unknown:
+                continue
+                
+            if x < GRID_COUNT - 1 and gems[y][x] == gems[y][x + 1]:
                 pairs.append(((x, y), (x + 1, y), Horizontal))
             
-            if y < GRID_COUNT - 1 and gems[y][x] == gems[y + 1][x] and gems[y][x] != Unknown:
+            if y < GRID_COUNT - 1 and gems[y][x] == gems[y + 1][x]:
                 pairs.append(((x, y), (x, y + 1), Vertical))
+                
+            if x < GRID_COUNT - 2 and gems[y][x] == gems[y][x + 2]:
+                pairs.append(((x, y), (x + 2, y), GapHorizontal))
+                
+            if y < GRID_COUNT - 2 and gems[y][x] == gems[y + 2][x]:
+                pairs.append(((x, y), (x, y + 2), GapVertical))
     
     
     # Step 2: For each pair, if there is a gem that can fill it in, then add it to the decision list
@@ -183,6 +194,10 @@ def makeDecisions(gems):
             if k < GRID_COUNT - 1 and j > 0 and gems[k + 1][j - 1] == gems[k][j]:               result.append((j - 1, k + 1, Right))    # SW of bottom
             if k < GRID_COUNT - 1 and j < GRID_COUNT - 1 and gems[k + 1][j + 1] == gems[k][j]:  result.append((j + 1, k + 1, Left))     # SE of bottom
             
+        if pairs[2] == GapVertical:
+            if x > 0 and gems[y + 1][x - 1] == gems[y + 1][x]:                                  result.append((x - 1, y + 1, Right))    # W of middle gap
+            if x < GRID_COUNT - 1 and gems[y + 1][x + 1] == gems[y + 1][x]:                    result.append((x + 1, y + 1, Left))     # E of middle gap
+            
         if pair[2] == Horizontal:
             if x > 0 and y > 0 and gems[y - 1][x - 1] == gems[y][x]:                            result.append((x - 1, y - 1, Down))     # NW of left
             if x > 0 and y < GRID_COUNT - 1 and gems[y + 1][x - 1] == gems[y][x]:               result.append((x - 1, y + 1, Up))       # SW of left
@@ -193,6 +208,10 @@ def makeDecisions(gems):
             if x >= 2 and gems[y][x - 2] == gems[y][x]:                                         result.append((x - 2, y, Right))        # W of left
             if j < GRID_COUNT - 2 and gems[k][j + 2] == gems[k][j]:                             result.append((j + 2, k, Left))         # E of right
 
+        if pair[2] == GapHorizontal:
+            if y > 0 and gems[y - 1][x + 1] == gems[y][x + 1]:                                  result.append((x + 1, y - 1, Down))     # N of middle gap
+            if y < GRID_COUNT - 1 and gems[y + 1][x + 1] == gems[y][x + 1]:                     result.append((x + 1, y + 1, Up))       # S of middle gap
+        
     
     # Step 3: Eliminate decisions that could potentially conflict with each other
     
