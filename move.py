@@ -65,5 +65,8 @@ class Move:
         return True
         
     
+    def __eq__(self, other):
+        return self.point == other.point and self.direction == other.direction and self.delay == other.delay
+        
     def __str__(self):
         return "Move %s %s, delay %dms" % (self.point, self.direction.name, int(self.delay * 1000))

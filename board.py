@@ -2,7 +2,6 @@ from definitions import *
 from utility import *
 from configuration import *
 import copy
-import sys
 
 
 class Board:

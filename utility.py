@@ -18,6 +18,18 @@ def valid_point(point):
     return point != None and in_bounds(point.x) and in_bounds(point.y)
     
 
+# Given a Point and its direction, returns the other Point that it needs to be swapped with
+def get_swap_point(point, direction):
+    if not valid_point(point):
+        return None
+        
+    if direction == Direction.left:     return (point.x - 1, point.y)
+    elif direction == Direction.right:  return (point.x + 1, point.y)
+    elif direction == Direction.up:     return (point.x, point.y - 1)
+    elif direction == Direction.down:   return (point.x, point.y + 1)
+    return None
+
+
 # Given a Board object, returns a 2D list of the textual representations of the colors
 def board_to_text(board):
     if board == None:

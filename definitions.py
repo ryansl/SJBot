@@ -30,6 +30,9 @@ class Point:
     def to_tuple(self):
         return (self.x, self.y)
         
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+        
     def __str__(self):
         return "(%d, %d)" % (self.x, self.y)
         
