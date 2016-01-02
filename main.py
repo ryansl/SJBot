@@ -16,6 +16,7 @@ def main():
     while True:
         while board == None or board.num_unknowns > Configuration.unknown_threshold:
             board = reader.get_board()
+            print board.num_unknowns
             
         moves = Strategy(board).decide()
         for move in moves:

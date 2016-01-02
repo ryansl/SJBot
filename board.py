@@ -139,12 +139,8 @@ class Board:
     def __setitem__(self, point, value):
         (x, y) = point
         if in_bounds(x) and in_bounds(y):
-            if self.data[y - 1][x - 1] == None:
-                self.num_unknowns -= 1
-                
             if value == None:
                 self.num_unknowns += 1
-                
             self.data[y - 1][x - 1] = value
         return value
             

@@ -109,4 +109,17 @@ class Strategy:
     
     # Using the board data, compute the best non-conflicting set of moves that maximize the score and return them as a list of Moves
     def decide(self):
+        
+        """
+        Algorithm description:
+        ----------------------------------
+        1. Determine all possible moves (which may conflict)
+        2. Compute the total points (primary metric) for each individual move
+        3. Order the moves from highest to lowest number of points
+        4. Find the best set of non-conflicting moves that maximizes the number of points earned
+        """
         return self._get_all_moves()
+        
+        
+        
+        
