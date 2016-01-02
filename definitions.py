@@ -27,16 +27,25 @@ class Point:
         self.x = x
         self.y = y
         
+    def to_tuple(self):
+        return (self.x, self.y)
+        
     def __str__(self):
         return "(%d, %d)" % (self.x, self.y)
         
     
 class Match:
-     def __init__(self, point, orientation, length):
+     def __init__(self, point, color, orientation, length, points, chain_level = 1):
          self.point = point
+         self.color = color.name if color != None else "unknown"
          self.orientation = orientation
          self.length = length
-         self.points = Configuration.points_table[length]
+         self.points = points * chain_level
+         self.chain_level = chain_level
+         
+     def update_chain_level(self, chain_level):
+         self.chain_level = chain_level
+         self.points = self.points * chain_level
          
      def __str__(self):
-         return "%s %s x%d -- %d points" % (self.point, self.orientation.name, self.length, self.points)
+         return "%s %s %s x%d -- %d points, chain #%d" % (self.color, self.point, self.orientation.name, self.length, self.points, self.chain_level)

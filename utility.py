@@ -27,7 +27,7 @@ def board_to_text(board):
     
     
 # Given a Match object, returns a list of Points in that match
-def get_blocks_from_match(match):
+def get_points_from_match(match):
     result = []
     vertical_multiplier = 0
     horizontal_multiplier = 0
