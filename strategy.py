@@ -115,11 +115,16 @@ class Strategy:
         ----------------------------------
         1. Determine all possible moves (which may conflict)
         2. Compute the total points (primary metric) for each individual move
-        3. Order the moves from highest to lowest number of points
-        4. Find the best set of non-conflicting moves that maximizes the number of points earned
+        3. Compute all sets of moves (moves that can be made simultaneously) that don't conflict with each other (ordered from top to bottom)
+        4. Find the move set that maximizes the total number of points earned
+        5. Order this move set from least chains to most chains (because delay is required for moves involving chains)
+        6. Compute the delay duration for the moves involving chains
         """
+        
+        all_moves = self._get_all_moves()       # All moves
+        move_dictionary = {}                    # Maps MoveID -> MoveObject
+        move_points = {}                        # Maps MoveID -> Points
+        move_sets = []                          # [[Move1, Move2, ...], [Move3, Move4, Move5], ...]
+        
         return self._get_all_moves()
-        
-        
-        
         
