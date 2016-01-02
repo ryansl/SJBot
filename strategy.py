@@ -84,12 +84,12 @@ class Strategy:
                 if j < gs - 2 and gems[k][j + 2] == gems[k][j]:                     result.append((j + 2, k, Left))         # E of right
 
             if pair[2] == GapHorizontal:
-                if y > 0 and gems[y - 1][x + 1] == gems[y][x + 1]:                  result.append((x + 1, y - 1, Down))     # N of middle gap
-                if y < gs - 1 and gems[y + 1][x + 1] == gems[y][x + 1]:             result.append((x + 1, y + 1, Up))       # S of middle gap
+                if y > 0 and gems[y - 1][x + 1] == gems[y][x]:                      result.append((x + 1, y - 1, Down))     # N of middle gap
+                if y < gs - 1 and gems[y + 1][x + 1] == gems[y][x]:                 result.append((x + 1, y + 1, Up))       # S of middle gap
         
             if pair[2] == GapVertical:
-                if x > 0 and gems[y + 1][x - 1] == gems[y + 1][x]:                  result.append((x - 1, y + 1, Right))    # W of middle gap
-                if x < gs - 1 and gems[y + 1][x + 1] == gems[y + 1][x]:             result.append((x + 1, y + 1, Left))     # E of middle gap
+                if x > 0 and gems[y + 1][x - 1] == gems[y][x]:                      result.append((x - 1, y + 1, Right))    # W of middle gap
+                if x < gs - 1 and gems[y + 1][x + 1] == gems[y][x]:                 result.append((x + 1, y + 1, Left))     # E of middle gap
         
         
         # Step 3: Remove duplicates from the list
