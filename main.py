@@ -10,12 +10,14 @@ from strategy import *
 
 def main():
     reader = Reader()
+    board = None
     
-    time.sleep(1)
+    time.sleep(1)       # temporary
     while True:
-        board = reader.get_board()
+        while board == None or board.num_unknowns > Configuration.unknown_threshold:
+            board = reader.get_board()
+            
         moves = Strategy(board).decide()
-        
         for move in moves:
             print str(move)
             #move.make()
