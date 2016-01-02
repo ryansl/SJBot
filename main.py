@@ -16,8 +16,6 @@ def main():
         board = reader.get_board()
         moves = Strategy(board).decide()
         
-        print board_to_text(board)
-        break
         for move in moves:
             print str(move)
             #move.make()

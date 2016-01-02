@@ -2,6 +2,7 @@ from definitions import *
 from configuration import *
 from board import *
 import pyscreenshot as Img
+import autopy
 
 
 class Reader:
@@ -17,6 +18,7 @@ class Reader:
     # Returns the PIL/Pillow image object from taking a screenshot at the given area
     def _get_image(self):
         try:
+            autopy.mouse.move(Configuration.idle_x, Configuration.idle_y)
             image = Img.grab(bbox = (Configuration.offset_x, Configuration.offset_y, Configuration.offset_x + Configuration.grid_size, Configuration.offset_y + Configuration.grid_size))
         except:
             return None

@@ -15,7 +15,7 @@ class Move:
     
     # Make the move by moving the mouse to the specific coordinates
     def make(self):
-        if not valid_points(self.point):
+        if not valid_point(self.point):
             return False
             
         # Original X and Y coordinates
