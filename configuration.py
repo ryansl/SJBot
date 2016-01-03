@@ -16,6 +16,9 @@ class Configuration:
     skip = 5                    # Percentage (100 / skip %) of pixels averaged to determine gem color (higher = slower, but more accurate)
     unknown_threshold = 16      # Max number of unknown gems allowed before converting board
     
+    debug = False               # Runtime flag -- show debug output
+    benchmark = False           # Runtime flag -- show performance data
+    calibrating = False         # Runtime flag -- show average RGB values when converting image to map
     
     # Color mapping table -- maps skip -> ([color -> average rgb value])
     color_table = {

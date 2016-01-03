@@ -17,6 +17,21 @@ def in_bounds(coordinate):
 def valid_point(point):
     return point != None and in_bounds(point.x) and in_bounds(point.y)
     
+    
+def print_debug(message):
+    if Configuration.debug:
+        print "[DEBUG] %s" % (message)
+        
+        
+def print_benchmark(message):
+    if Configuration.benchmark:
+        print "[TIMER] %s" % (message)
+
+
+def print_calibrate(message):
+    if Configuration.calibrate:
+        print "[COLOR] %s" % (message)
+
 
 # Given a Point and its direction, returns the other Point that it needs to be swapped with
 def get_swap_point(point, direction):
