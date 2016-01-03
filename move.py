@@ -39,7 +39,7 @@ class Move:
         if self.direction == Direction.up:       dy = -1
         elif self.direction == Direction.down:   dy = 1
         elif self.direction == Direction.left:   dx = -1
-        elif self.direction == Direction.right:  dx = 1000
+        elif self.direction == Direction.right:  dx = 1
     
         tx = x + (dx * gs)
         ty = y + (dy * gs)
