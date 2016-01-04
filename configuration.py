@@ -14,7 +14,7 @@ class Configuration:
 
     tolerance = 3               # RGB tolerance range for gem color detection
     skip = 5                    # Percentage (100 / skip %) of pixels averaged to determine gem color (higher = slower, but more accurate)
-    unknown_threshold = 16      # Max number of unknown gems allowed before converting board
+    unknown_threshold = 32      # Max number of unknown gems allowed before converting board
     
     debug = False               # Runtime flag -- show debug output
     benchmark = False           # Runtime flag -- show performance data
