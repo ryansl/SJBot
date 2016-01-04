@@ -47,7 +47,6 @@ def main(args):
             for move in moves:
                 print_debug("Making move: %s" % (str(move)))
                 move.make()
-                time.sleep(0.001)
 
             move_time = benchmark.time("move")
             print_benchmark("Moving took %f seconds" % (move_time))
