@@ -24,7 +24,7 @@ def main():
         moves = Strategy(board).decide()
         for move in moves:
             move.make()
-                
+
         board = None
     
 

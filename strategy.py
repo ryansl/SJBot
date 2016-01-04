@@ -3,6 +3,7 @@ from utility import *
 from configuration import *
 from board import *
 from move import *
+import copy
 
 
 class Strategy:
@@ -65,8 +66,7 @@ class Strategy:
             y = pair[0][1]
             j = pair[1][0]             # Bottom/Right gem
             k = pair[1][1]
-        
-            # Prioritize vertical clears over horizontal clears
+
             if pair[2] == Vertical:
                 if y > 0 and x > 0 and gems[y - 1][x - 1] == gems[y][x]:            result.append((x - 1, y - 1, Right))    # NW of top
                 if y > 0 and x < gs - 1 and gems[y - 1][x + 1] == gems[y][x]:       result.append((x + 1, y - 1, Left))     # NE of top
@@ -101,8 +101,8 @@ class Strategy:
             if not s in seen:
                 finalResult.append(r)
                 seen[s] = True        
-                
-                
+
+
         # Step 4: Convert the list of (x, y, direction) into a list of Move objects, and return it
         return [Move(Point(r[0] + 1, r[1] + 1), oldToNewDirection[r[2]]) for r in finalResult]
         
@@ -114,17 +114,83 @@ class Strategy:
         Algorithm description:
         ----------------------------------
         1. Determine all possible moves (which may conflict)
-        2. Compute the total points (primary metric) for each individual move
-        3. Compute all sets of moves (moves that can be made simultaneously) that don't conflict with each other (ordered from top to bottom)
-        4. Find the move set that maximizes the total number of points earned
-        5. Order this move set from least chains to most chains (because delay is required for moves involving chains)
-        6. Compute the delay duration for the moves involving chains
+        2. Compute the metrics for each individual move -- points gained, chain length, number of moves created
+        3. Order the move information (from previous step) based on a calculation involving all three metrics
+        4. Start with the best move and process it by updating a virtual board, then remove all matches
+        5. Then look at the board again and move down to the next best move (skip if it no longer exists, aka no matches0
+        6. Repeat this this step and add all moves to the final move set (and add delays if needed for chains)
         """
         
         all_moves = self._get_all_moves()       # All moves
+        move_count = len(all_moves)             # Number of all moves
         move_dictionary = {}                    # Maps MoveID -> MoveObject
-        move_points = {}                        # Maps MoveID -> Points
-        move_sets = []                          # [[Move1, Move2, ...], [Move3, Move4, Move5], ...]
-        
-        return self._get_all_moves()
-        
+        move_info = {}                          # Maps MoveID -> (Points, ChainLength, NumMovesCreated)]
+        move_score = {}                         # Maps MoveID -> MoveScore (where MoveScore is a score computed from the three metrics)
+        move_set = []                           # [MoveID1, MoveID2, ...] ordered from highest to lowest score
+        move_counter = 0                        # Incremented by one for every move, provides the move ID
+
+
+        # Assign each move a unique ID to identify it to be used as a key for the dictionaries
+        for move in all_moves:
+            move_dictionary[move_counter] = move
+            move_counter += 1
+
+
+        # Compute the three metrics for each move (points, chain length, and number of moves created)
+        for id in range(move_count):
+            total_points = 0
+            max_chain_length = 1
+
+            move = move_dictionary[id]
+            swap_point = get_swap_point(move.point, move.direction)
+            match_set = self.board.stimulate_swap(move.point, swap_point)
+
+            for match in match_set:
+                total_points += match.points
+                max_chain_length = match.chain_level if match.chain_level > max_chain_length else max_chain_length
+
+            next_board = copy.deepcopy(self.board)
+            next_board.swap(move.point, swap_point)
+            next_board.remove_matches()
+
+            strategy = Strategy(next_board)
+            num_moves_created = len(strategy._get_all_moves())
+            move_info[id] = (total_points, max_chain_length, num_moves_created)
+
+
+        # Build the move set and order it from best move to worst move
+        for move_id, info in move_info.iteritems():
+            move_score[move_id] = info[0] + (info[2] * 15)      # Currently, we aren't factoring chain length into the score
+
+        move_set = [move_id for move_id in sorted(move_score, key = move_score.get, reverse = True)]
+
+
+        # Going from best move to worst move, add the move to the move set if it's still possible and creates
+        # a match, apply the move to the board and update it, and repeat until we have processed all possible moves
+        best_move_set = []
+        current_board = copy.deepcopy(self.board)
+
+        for move_id in move_set:
+            move = move_dictionary[move_id]
+            swap_point = get_swap_point(move.point, move.direction)
+
+            current_board.swap(move.point, swap_point)
+            matches = current_board.get_matches()
+
+            # If we have matches, then this move still works, so add it to the final move set
+            if len(matches) > 0:
+                best_move_set.append(move)
+                move.delay = 0                  # TODO: Change this in the future
+
+                # Account for chains by continuously clearing the board of matches until no more exist
+                while len(matches) > 0:
+                    current_board.remove_matches(matches)
+                    matches = current_board.get_matches()
+
+            # Otherwise, this move doesn't work, so undo the swap
+            else:
+                current_board.swap(swap_point, move.point)
+
+
+        # Return the final move set
+        return best_move_set

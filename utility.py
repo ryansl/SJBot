@@ -23,10 +23,10 @@ def get_swap_point(point, direction):
     if not valid_point(point):
         return None
         
-    if direction == Direction.left:     return (point.x - 1, point.y)
-    elif direction == Direction.right:  return (point.x + 1, point.y)
-    elif direction == Direction.up:     return (point.x, point.y - 1)
-    elif direction == Direction.down:   return (point.x, point.y + 1)
+    if direction == Direction.left:     return Point(point.x - 1, point.y)
+    elif direction == Direction.right:  return Point(point.x + 1, point.y)
+    elif direction == Direction.up:     return Point(point.x, point.y - 1)
+    elif direction == Direction.down:   return Point(point.x, point.y + 1)
     return None
 
 
