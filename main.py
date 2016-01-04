@@ -37,7 +37,8 @@ def main(args):
             
         moves = Strategy(board).decide()
         for move in moves:
-            move.make()        
+            move.make()
+
         board = None
         
         cycle_time = benchmark.time("main")
