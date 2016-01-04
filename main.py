@@ -16,7 +16,8 @@ def main(args):
     benchmark = Benchmark()
     board = None
     runOnce = False
-    
+    counter = 1
+
     if len(args) > 1:
         for x in range(1, len(args)):
             if args[x] == "-d":    Configuration.debug = True
@@ -28,22 +29,38 @@ def main(args):
         time.sleep(1)
     
     while True:
+        print_debug("Starting iteration %d" % (counter))
         benchmark.start("main")
         
-        while board == None or board.num_unknowns > Configuration.unknown_threshold:
+        while not runOnce and (board == None or board.num_unknowns > Configuration.unknown_threshold):
             board = reader.get_board()
             if board.num_unknowns > board.size * board.size * 0.75:         # If we're not focused on the board, then wait
                 time.sleep(1)
-            
-        moves = Strategy(board).decide()
-        for move in moves:
-            move.make()
+
+        if board != None:
+            benchmark.start("decision")
+            moves = Strategy(board).decide()
+            decide_time = benchmark.time("decision")
+            print_benchmark("Deciding took %f seconds" % (decide_time))
+
+            benchmark.start("move")
+            for move in moves:
+                print_debug("Making move: %s" % (str(move)))
+                move.make()
+
+            move_time = benchmark.time("move")
+            print_benchmark("Moving took %f seconds" % (move_time))
+
+            cycle_time = benchmark.time("main")
+            print_benchmark("Total %f seconds" % (cycle_time))
+            print_debug("Ending iteration %d \n" % (counter))
+
+        else:
+            print_debug("Invalid board, skipping iteration %d" % (counter))
 
         board = None
-        
-        cycle_time = benchmark.time("main")
-        print_benchmark("")
-        
+        counter += 1
+
         if runOnce:
             break
     
