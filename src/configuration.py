@@ -2,6 +2,9 @@ from definitions import *
 
 
 class Configuration:
+    screen_width = 1440         # Width of computer screen
+    screen_height = 900         # Height of computer screen
+
     offset_x = 930              # X offset of grid
     offset_y = 85               # Y offset of grid
     grid_size = 480             # Size of grid (square)
@@ -15,7 +18,8 @@ class Configuration:
     tolerance = 3               # RGB tolerance range for gem color detection
     skip = 5                    # Percentage (100 / skip %) of pixels averaged to determine gem color (higher = slower, but more accurate)
     unknown_threshold = 32      # Max number of unknown gems allowed before converting board
-    
+
+    enabled = False             # Runtime flag -- run the bot algorithm?
     debug = False               # Runtime flag -- show debug output
     benchmark = False           # Runtime flag -- show performance data
     calibrating = False         # Runtime flag -- show average RGB values when converting image to map

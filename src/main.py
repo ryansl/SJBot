@@ -6,11 +6,31 @@ from board import *
 from move import *
 from reader import *
 from strategy import *
+import autopy
+import threading
 import time
 import sys
 
-# TODO: Fix bug where the bot suddenly stops working despite matches existing
 
+# Enables or disables the bot depending on where the mouse is
+def enable_toggle():
+    while True:
+        (x, y) = autopy.mouse.get_pos()
+
+        # Move mouse to top right corner to start the bot
+        if x > Configuration.screen_width - 5 and y == 0:
+            print_debug("Bot Enabled")
+            Configuration.enabled = True
+
+        # Move mouse to top left corner to stop the bot
+        elif x < 5 and y == 0:
+            print_debug("Bot Disabled")
+            Configuration.enabled = False
+
+        time.sleep(0.1)
+
+
+# Main function, entrypoint of the application
 def main(args):
     reader = Reader()
     benchmark = Benchmark()
@@ -27,15 +47,29 @@ def main(args):
             
     if runOnce:
         time.sleep(1)
-    
+    else:
+        toggle_thread = threading.Thread(target = enable_toggle)
+        toggle_thread.daemon = True
+        toggle_thread.start()
+
+
     while True:
+        if not Configuration.enabled:
+            time.sleep(0.1)
+            continue
+
         print_debug("Starting iteration %d" % (counter))
         benchmark.start("main")
-        
+
         while not runOnce and (board == None or board.num_unknowns > Configuration.unknown_threshold):
+            if not Configuration.enabled:
+                time.sleep(0.1)
+                continue
+
             board = reader.get_board()
-            if board.num_unknowns > board.size * board.size * 0.75:         # If we're not focused on the board, then wait
+            if board.num_unknowns >= board.size * board.size * 0.75:
                 time.sleep(1)
+                continue
 
         if board != None:
             benchmark.start("decision")
