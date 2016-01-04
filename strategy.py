@@ -160,11 +160,15 @@ class Strategy:
 
         # Build the move set and order it from best move to worst move
         for move_id, info in move_info.iteritems():
-            move_score[move_id] = info[0] + (info[2] * 15)      # Currently, we aren't factoring chain length into the score
+            move_score[move_id] = info[0]
 
+
+        # It seems like returning all moves in ranked order is better than returning a set of non-conflicting moves
         move_set = [move_id for move_id in sorted(move_score, key = move_score.get, reverse = True)]
+        return [move_dictionary[x] for x in move_set]
 
 
+        """
         # Going from best move to worst move, add the move to the move set if it's still possible and creates
         # a match, apply the move to the board and update it, and repeat until we have processed all possible moves
         best_move_set = []
@@ -180,7 +184,7 @@ class Strategy:
             # If we have matches, then this move still works, so add it to the final move set
             if len(matches) > 0:
                 best_move_set.append(move)
-                move.delay = 0                  # TODO: Change this in the future
+                move.delay = 0                  # From what I've seen, no delay is best
 
                 # Account for chains by continuously clearing the board of matches until no more exist
                 while len(matches) > 0:
@@ -194,3 +198,4 @@ class Strategy:
 
         # Return the final move set
         return best_move_set
+        """
