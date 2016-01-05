@@ -160,7 +160,7 @@ class Strategy:
 
         # Build the move set and order it from best move to worst move
         for move_id, info in move_info.iteritems():
-            move_score[move_id] = info[0]
+            move_score[move_id] = info[0] + (info[2] * 5)
 
 
         # It seems like returning all moves in ranked order is better than returning a set of non-conflicting moves
