@@ -44,7 +44,11 @@ def main(args):
             elif args[x] == "-b":  Configuration.benchmark = True
             elif args[x] == "-c":  Configuration.calibrating = True
             elif args[x] == "-1":  runOnce = True
-            
+
+    if Configuration.look_ahead_count < 1:
+        print "Error: look_ahead_count in configuration must be at least 1"
+        return False
+
     if runOnce:
         time.sleep(1)
     else:
@@ -73,16 +77,14 @@ def main(args):
 
         if board != None:
             benchmark.start("decision")
-            moves = Strategy(board).decide()
+            move_set = Strategy(board).decide()
             decide_time = benchmark.time("decision")
             print_benchmark("Deciding took %f seconds" % (decide_time))
 
             benchmark.start("move")
-            for move in moves:
-                print_debug("Making move: %s" % (str(move)))
-                move.make()
-
+            move_set.make()
             move_time = benchmark.time("move")
+            print_debug(str(move_set))
             print_benchmark("Moving took %f seconds" % (move_time))
 
             cycle_time = benchmark.time("main")
@@ -97,6 +99,8 @@ def main(args):
 
         if runOnce:
             break
+
+    return True
     
 
 if __name__ == "__main__":

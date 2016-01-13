@@ -1,4 +1,5 @@
 from enum import Enum
+import math
     
     
 class Color(Enum):
@@ -43,12 +44,15 @@ class Match:
          self.color = color.name if color != None else "unknown"
          self.orientation = orientation
          self.length = length
-         self.points = points * chain_level
+         self.points = self._get_points(points, chain_level)
          self.chain_level = chain_level
          
      def update_chain_level(self, chain_level):
          self.chain_level = chain_level
-         self.points = self.points * chain_level
+         self.points = self._get_points(self.points, chain_level)
+
+     def _get_points(self, points, chain_level):
+        return points * math.pow(2, chain_level - 1)        # Chain multiplier is set to 2, modify if needed (to avoid circular dependencies)
          
      def __str__(self):
          return "%s %s %s x%d -- %d points, chain #%d" % (self.color, self.point, self.orientation.name, self.length, self.points, self.chain_level)

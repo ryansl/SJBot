@@ -6,11 +6,11 @@ import math
 import time
 
 
+# Represents a single move involving the swapping of only two gems
 class Move:
-    def __init__(self, point, direction, delay = 0):
+    def __init__(self, point, direction):
         self.point = point
         self.direction = direction
-        self.delay = delay if delay > 0 else 0
     
     
     # Make the move by moving the mouse to the specific coordinates
@@ -60,14 +60,29 @@ class Move:
         except:
             return False
             
-        if self.delay > 0:
-            time.sleep(self.delay)
-            
         return True
         
     
     def __eq__(self, other):
-        return self.point == other.point and self.direction == other.direction and self.delay == other.delay
+        return self.point == other.point and self.direction == other.direction
         
     def __str__(self):
-        return "Move %s %s, delay %dms" % (self.point, self.direction.name, int(self.delay * 1000))
+        return "Move %s %s" % (self.point, self.direction.name)
+
+
+# Represents a set of moves that can be made simultaneously, and related information about them
+class MoveSet:
+    def __init__(self, moves, points, delay):
+        self.moves = moves
+        self.points = points
+        self.delay = delay if delay > 0 else 0
+
+    def make(self):
+        for move in self.moves:
+            move.make()
+
+        if self.delay > 0:
+            time.sleep(self.delay)
+
+    def __str__(self):
+        return "\n".join(["Total %d moves, delay %dms" % (len(self.moves), int(self.delay * 1000))] + [str(m) for m in self.moves])

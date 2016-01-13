@@ -99,8 +99,7 @@ class Board:
             points = get_points_from_match(match)
             for point in points:
                 del self[point.to_tuple()]
-            
-        
+
     
     # Return the list of all Matches created if we swapped these two gems on the board, including chains (does not change the board)
     def stimulate_swap(self, pa, pb):

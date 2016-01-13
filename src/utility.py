@@ -33,6 +33,17 @@ def print_calibrate(message):
         print "[COLOR] %s" % (message)
 
 
+# Returns the powerset of the current list
+def powerset(seq):
+    if len(seq) <= 1:
+        yield seq
+        yield []
+    else:
+        for item in powerset(seq[1:]):
+            yield [seq[0]]+item
+            yield item
+
+
 # Given a Point and its direction, returns the other Point that it needs to be swapped with
 def get_swap_point(point, direction):
     if not valid_point(point):
