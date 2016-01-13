@@ -152,110 +152,14 @@ class Strategy:
             move_score[move_id] = info[0] + (info[2] * 5)       # points_gained + (num_moves_created * 5)
 
 
-        # If we have more than a certain number of moves, then the powerset is too large, so instead
-        # just return a MoveSet of all the possible moves ranked from best move to worst move (based on the previous score)
-        if move_count > Configuration.powerset_limit:
-            moves = []
-            total_points = 0
-            highest_chain = 0
+        # Order the moves from best move to worst move (based on score) and return them as a MoveSet with delays added
+        moves = []
+        total_points = 0
+        highest_chain = 0
 
-            for move_id in sorted(move_score, key = move_score.get, reverse = True):
-                moves.append(move_dictionary[move_id])
-                total_points += move_info[move_id][0]
-                highest_chain = move_info[move_id][1] if move_info[move_id][1] > highest_chain else highest_chain
+        for move_id in sorted(move_score, key = move_score.get, reverse = True):
+            moves.append(move_dictionary[move_id])
+            total_points += move_info[move_id][0]
+            highest_chain = move_info[move_id][1] if move_info[move_id][1] > highest_chain else highest_chain
 
-            return MoveSet(moves, total_points, highest_chain * Configuration.chain_delay)
-
-
-        # Otherwise, compute the permutated powerset
-        # (This is the powerset with every order possible for each subset in the powerset) of the all_moves list)
-        # The size of this powerset is about 4^(move_count - 1)
-        unordered_power_set = powerset(range(move_count))
-        power_set = []
-        for p in unordered_power_set:
-            for s in itertools.permutations(p):
-                power_set.append(list(s))
-
-
-        # Go through each move set in the permutated powerset
-        move_rank = {}                      # Maps move index (in power_set) to (total_points, highest_chain)
-        counter = 0                         # Counter, incremented by one for every outer loop iteration
-
-        for move_set in power_set:
-            board = copy.deepcopy(self.board)
-            add_move = True
-            points = 0
-            highest_chain = 0
-
-
-            # Do not process invalid move sets
-            if move_set == None or len(move_set) == 0:
-                continue
-
-
-            # Test the move set by applying the moves to a temporary board and updating it
-            for move_id in move_set:
-                move = move_dictionary[move_id]
-                swap_point = get_swap_point(move.point, move.direction)
-
-                board.swap(move.point, swap_point)
-                matches = board.get_matches()
-
-                # If we get no matches, then this means that this move conflicts with another, so don't consider it
-                if matches == None or len(matches) == 0:
-                    add_move = False
-                    break
-
-                # Add points from all matches to the total points gained, and update the board to remove match chains
-                while len(matches) > 0:
-                    for match in matches:
-                        points += match.points
-                        if match.chain_level > highest_chain:
-                            highest_chain = match.chain_level
-
-                    board.remove_matches(matches)
-                    matches = board.get_matches()
-
-
-            # If one or more of the moves conflict, then don't consider this move set
-            if not add_move:
-                move_rank[counter] = (0, 0)
-                counter += 1
-                continue
-
-
-            # We want to find the best move set that will maximize the points gained over X number of moves
-            # So initialize another Strategy and have it find the number of points gained from the next move set
-            # considering the updated board. That Strategy instance can also recursively instantiate other instances,
-            # depending on the integer value set for the look_ahead_count.
-            if self.look_ahead_counter >= 1:
-                strategy = Strategy(board, self.look_ahead_counter - 1)
-                strategy_result = strategy.decide()
-                points += strategy_result.points
-
-
-            # Record this move set
-            move_rank[counter] = (points, highest_chain)
-            counter += 1
-
-
-        # Now that we have the points gained over X total moves from all the possible move sets,
-        # find the move set that maximizes the number of points gained.
-        best_move_index = None
-        best_move_points = 0
-
-        for move_index, (points, chain) in move_rank.iteritems():
-            if best_move_index == None or points > best_move_points:
-                best_move_index = move_index
-                best_move_points = points
-
-
-        # If there is no best move for some reason, return an empty MoveSet object
-        if best_move_index == None or best_move_index < 0:
-            return MoveSet([], 0, 0)
-
-
-        # Build the final MoveSet object, convert move IDs to Move objects, and add a delay. Then return it
-        best_move_set = power_set[best_move_index]
-        highest_chain = move_rank[best_move_index][1]
-        return MoveSet([move_dictionary[id] for id in best_move_set], best_move_points, highest_chain * Configuration.chain_delay)
+        return MoveSet(moves, total_points, (highest_chain - 1) * Configuration.chain_delay)
