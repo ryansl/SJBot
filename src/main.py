@@ -49,6 +49,31 @@ def main(args):
         print "Error: look_ahead_count in configuration must be at least 1"
         return False
 
+
+    # Calibration mode?
+    if Configuration.calibrating:
+        raw_input("Calibration Mode - Open SC2 window or image in fullscreen, then press Enter: \n")
+
+        avg_board = reader.get_board(True)
+        color_board = reader.get_board(False)
+        gs = Configuration.grid_length
+
+        print_calibrate("Board color averages")
+        for y in range(1, gs + 1):
+            for x in range(1, gs + 1):
+                print avg_board[(x, y)], 
+            print "\n"
+
+        print_calibrate("Board color estimates")
+        for y in range(1, gs + 1):
+            for x in range(1, gs + 1):
+                print color_board[(x, y)],
+            print "\n"
+
+        return True
+
+
+    # Run once or permanently?
     if runOnce:
         time.sleep(1)
     else:
@@ -57,6 +82,7 @@ def main(args):
         toggle_thread.start()
 
 
+    # Main loop
     while True:
         if not Configuration.enabled:
             time.sleep(0.1)
@@ -102,6 +128,6 @@ def main(args):
 
     return True
     
-
+    
 if __name__ == "__main__":
     main(sys.argv)

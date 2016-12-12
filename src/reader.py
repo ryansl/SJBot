@@ -12,8 +12,8 @@ class Reader:
         
     
     # Takes a screenshot, converts it, and returns a Board object
-    def get_board(self):
-        return self._convert_image_to_board(self._get_image())
+    def get_board(self, calibration_mode = False):
+        return self._convert_image_to_board(self._get_image(), calibration_mode)
         
     
     # Returns the PIL/Pillow image object from taking a screenshot at the given area
@@ -32,8 +32,8 @@ class Reader:
         return image
     
     
-    # Given a PIL/Pillow image object, determines the colors of all gems on the grid and returns them in a Board object
-    def _convert_image_to_board(self, image):
+    # Given a PIL/Pillow image object, determines the colors (or average RGB in calibration mode) of all gems on the grid and returns them in a Board object
+    def _convert_image_to_board(self, image, calibration_mode = False):
         if image ==  None:
             return None
 
@@ -66,14 +66,18 @@ class Reader:
                 average = (totalRed / sampleCount, totalGreen / sampleCount, totalBlue / sampleCount)
 
 
-                # Use the average to predict the color of this gem
-                for color, rgb in Configuration.color_table[Configuration.skip].iteritems():
-                    test = [abs(rgb[index] - average[index]) <= Configuration.tolerance for index in range(3)]
-                    if test[0] == True and test[1] == True and test[2] == True:
-                        gemColor = color
-                        break
+                # Use the average to predict the color of this gem (or in calibration mode, return the average)
+                if calibration_mode:
+                    result[(x + 1, y + 1)] = "(" + ",".join(map(lambda s: str(s), average)) + ")"
+
+                else:
+                    for color, rgb in Configuration.color_table[Configuration.skip].iteritems():
+                        test = [abs(rgb[index] - average[index]) <= Configuration.tolerance for index in range(3)]
+                        if test[0] == True and test[1] == True and test[2] == True:
+                            gemColor = color
+                            break
     
-                result[(x + 1, y + 1)] = gemColor
+                    result[(x + 1, y + 1)] = gemColor
 
         time_elapsed = self.benchmark.time("convert_image")
         print_benchmark("Converting to board took %f seconds" % (time_elapsed))

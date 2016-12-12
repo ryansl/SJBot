@@ -29,8 +29,8 @@ def print_benchmark(message):
 
 
 def print_calibrate(message):
-    if Configuration.calibrate:
-        print "[COLOR] %s" % (message)
+    if Configuration.calibrating:
+        print "[CALIBRATE] %s" % (message)
 
 
 # Returns the powerset of the current list
