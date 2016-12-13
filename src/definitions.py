@@ -3,24 +3,24 @@ import math
     
     
 class Color(Enum):
-    white = 1
-    red = 2
-    blue = 3
-    purple = 4
-    green = 5
-    yellow = 6
+    white = "WHITE"
+    red = "RED"
+    blue = "BLUE"
+    purple = "PURPLE"
+    green = "GREEN"
+    yellow = "YELLOW"
     
     
 class Direction(Enum):
-    left = 1
-    right = 2
-    up = 3
-    down = 4
+    left = "LEFT"
+    right = "RIGHT"
+    up = "UP"
+    down = "DOWN"
     
    
 class Orientation(Enum):
-    vertical = 1
-    horizontal = 2
+    vertical = "VERTICAL"
+    horizontal = "HORIZONTAL"
     
     
 class Point:
@@ -41,7 +41,7 @@ class Point:
 class Match:
      def __init__(self, point, color, orientation, length, points, chain_level = 1):
          self.point = point
-         self.color = color.name if color != None else "unknown"
+         self.color = color
          self.orientation = orientation
          self.length = length
          self.points = self._get_points(points, chain_level)
@@ -55,4 +55,4 @@ class Match:
         return points * math.pow(2, chain_level - 1)        # Chain multiplier is set to 2, modify if needed (to avoid circular dependencies)
          
      def __str__(self):
-         return "%s %s %s x%d -- %d points, chain #%d" % (self.color, self.point, self.orientation.name, self.length, self.points, self.chain_level)
+         return "%s %s %s x%d -- %d points, chain #%d" % (self.color, self.point, self.orientation, self.length, self.points, self.chain_level)
