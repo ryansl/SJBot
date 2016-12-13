@@ -137,7 +137,7 @@ class Strategy:
                 total_points += match.points
                 max_chain_length = match.chain_level if match.chain_level > max_chain_length else max_chain_length
 
-            next_board = copy.deepcopy(szelf.board)
+            next_board = copy.deepcopy(self.board)
             next_board.swap(move.point, swap_point)
             next_board.remove_matches()
 
