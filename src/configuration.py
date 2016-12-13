@@ -20,7 +20,7 @@ class Configuration:
 
     tolerance = 3               # RGB tolerance range for gem color detection
     skip = 5                    # Percentage (100 / skip %) of pixels averaged to determine gem color (higher = slower, but more accurate)
-    unknown_threshold = 32      # Max number of unknown gems allowed before converting board
+    unknown_threshold = 48      # Max number of unknown gems allowed before converting board
     look_ahead_count = 3        # Look ahead X number of moves to find the best move
     chain_delay = 0.25          # Number of seconds to delay for each chain level above one
     powerset_limit = 5          # Maximum number of moves we can calculate powerset for without hindering performance

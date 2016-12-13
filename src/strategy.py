@@ -161,4 +161,4 @@ class Strategy:
             total_points += move_info[move_id][0]
             highest_chain = move_info[move_id][1] if move_info[move_id][1] > highest_chain else highest_chain
 
-        return MoveSet(moves, total_points, (highest_chain - 1) * Configuration.chain_delay)
+        return MoveSet(moves, total_points, 0)
