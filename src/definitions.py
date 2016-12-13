@@ -34,9 +34,6 @@ class Point:
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
         
-    def __str__(self):
-        return "(%d, %d)" % (self.x, self.y)
-        
     
 class Match:
      def __init__(self, point, color, orientation, length, points, chain_level = 1):
@@ -44,15 +41,12 @@ class Match:
          self.color = color
          self.orientation = orientation
          self.length = length
-         self.points = self._get_points(points, chain_level)
+         self.points = points
          self.chain_level = chain_level
          
      def update_chain_level(self, chain_level):
          self.chain_level = chain_level
          self.points = self._get_points(self.points, chain_level)
-
-     def _get_points(self, points, chain_level):
-        return points * math.pow(2, chain_level - 1)        # Chain multiplier is set to 2, modify if needed (to avoid circular dependencies)
          
-     def __str__(self):
-         return "%s %s %s x%d -- %d points, chain #%d" % (self.color, self.point, self.orientation, self.length, self.points, self.chain_level)
+     def _get_points(self, base_points, chain_level):
+        return base_points * pow(2, chain_level - 1)

@@ -1,8 +1,9 @@
 from definitions import *
 
-
-# 1080p:
-# (1305, 100) to (1881, 676)
+"""
+Grid positions for 1080p:
+    (1305, 100) to (1881, 676)
+"""
 
 class Configuration:
     screen_width = 1920         # Width of computer screen
@@ -13,10 +14,9 @@ class Configuration:
     grid_size = 576             # Size of grid (square)
     gem_size = 72               # Size of gem (square)
     grid_length = 8             # Number of gems from top-bottom or left-right
-    # chain_multiplier = 2        # Multiplier for chains of matches (eg: matching a gem, other gems fall, another match automatically happens)
-    
-    idle_x = 500                # X offset for idle position
-    idle_y = 200                # Y offset for idle position
+
+    idle_x = 675                # X offset for idle position
+    idle_y = 400                # Y offset for idle position
 
     tolerance = 3               # RGB tolerance range for gem color detection
     skip = 5                    # Percentage (100 / skip %) of pixels averaged to determine gem color (higher = slower, but more accurate)

@@ -35,15 +35,12 @@ def main(args):
     reader = Reader()
     benchmark = Benchmark()
     board = None
-    runOnce = False
-    counter = 1
 
     if len(args) > 1:
         for x in range(1, len(args)):
             if args[x] == "-d":    Configuration.debug = True
             elif args[x] == "-b":  Configuration.benchmark = True
             elif args[x] == "-c":  Configuration.calibrating = True
-            elif args[x] == "-1":  runOnce = True
 
     if Configuration.look_ahead_count < 1:
         print "Error: look_ahead_count in configuration must be at least 1"
@@ -53,33 +50,17 @@ def main(args):
     # Calibration mode?
     if Configuration.calibrating:
         raw_input("Calibration Mode - Open SC2 window or image in fullscreen, then press Enter: \n")
-
-        avg_board = reader.get_board(True)
-        color_board = reader.get_board(False)
-        gs = Configuration.grid_length
-
-        print_calibrate("Board color averages")
-        for y in range(1, gs + 1):
-            for x in range(1, gs + 1):
-                print avg_board[(x, y)], 
-            print "\n"
-
-        print_calibrate("Board color estimates")
-        for y in range(1, gs + 1):
-            for x in range(1, gs + 1):
-                print color_board[(x, y)],
-            print "\n"
-
+        print_debug("Board color averages")
+        print_board(reader.get_board(True))
+        print_debug("Board color estimates")
+        print_board(reader.get_board(False))
         return True
 
 
-    # Run once or permanently?
-    if runOnce:
-        time.sleep(1)
-    else:
-        toggle_thread = threading.Thread(target = enable_toggle)
-        toggle_thread.daemon = True
-        toggle_thread.start()
+    # Separate thread for handling start/stop controls
+    toggle_thread = threading.Thread(target = enable_toggle)
+    toggle_thread.daemon = True
+    toggle_thread.start()
 
 
     # Main loop
@@ -88,46 +69,32 @@ def main(args):
             time.sleep(0.1)
             continue
 
-        print_debug("Starting iteration %d" % (counter))
+        # Keep reading the board until we get an accurate representation of it
         benchmark.start("main")
-
-        while not runOnce and (board == None or board.num_unknowns > Configuration.unknown_threshold):
-            if not Configuration.enabled:
-                time.sleep(0.1)
-                continue
-
+        board = reader.get_board()
+        while Configuration.enabled and (board == None or board.num_unknowns > Configuration.unknown_threshold):
             board = reader.get_board()
-            if board.num_unknowns >= board.size * board.size * 0.75:
-                time.sleep(1)
-                continue
+            time.sleep(0.25)
 
-        if board != None:
-            benchmark.start("decision")
-            move_set = Strategy(board).decide()
-            decide_time = benchmark.time("decision")
-            print_benchmark("Deciding took %f seconds" % (decide_time))
 
-            benchmark.start("move")
-            move_set.make()
-            move_time = benchmark.time("move")
-            print_debug(str(move_set))
-            print_benchmark("Moving took %f seconds" % (move_time))
-
-            cycle_time = benchmark.time("main")
-            print_benchmark("Total %f seconds" % (cycle_time))
-            print_debug("Ending iteration %d \n" % (counter))
-
-        else:
-            print_debug("Invalid board, skipping iteration %d" % (counter))
-
+        # Decide which moves to make and execute them
+        benchmark.start("decision")
+        move_set = Strategy(board).decide()
+        decide_time = benchmark.time("decision")
+        move_set.make()
+        total_time = benchmark.time("main")
         board = None
-        counter += 1
 
-        if runOnce:
-            break
+
+        # Print benchmark information
+        if Configuration.benchmark:
+            print_debug("Total time: %f" % (total_time))
+            print_debug("Decision time: %f" % (decide_time))
+            print_debug("-----------------------")
 
     return True
     
     
+# Call main
 if __name__ == "__main__":
     main(sys.argv)

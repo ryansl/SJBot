@@ -65,9 +65,6 @@ class Move:
     
     def __eq__(self, other):
         return self.point == other.point and self.direction == other.direction
-        
-    def __str__(self):
-        return "Move %s %s" % (self.point, self.direction)
 
 
 # Represents a set of moves that can be made simultaneously, and related information about them
@@ -83,6 +80,3 @@ class MoveSet:
 
         if self.delay > 0:
             time.sleep(self.delay)
-
-    def __str__(self):
-        return "\n".join(["Total %d moves, delay %dms" % (len(self.moves), int(self.delay * 1000))] + [str(m) for m in self.moves])

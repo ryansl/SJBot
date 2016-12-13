@@ -8,9 +8,8 @@ import itertools
 
 
 class Strategy:
-    def __init__(self, board, look_ahead_counter = Configuration.look_ahead_count):
+    def __init__(self, board):
         self.board = board
-        self.look_ahead_counter = look_ahead_counter
         
     
     # Returns all possible Moves that can be made on the board
@@ -138,7 +137,7 @@ class Strategy:
                 total_points += match.points
                 max_chain_length = match.chain_level if match.chain_level > max_chain_length else max_chain_length
 
-            next_board = copy.deepcopy(self.board)
+            next_board = copy.deepcopy(szelf.board)
             next_board.swap(move.point, swap_point)
             next_board.remove_matches()
 
