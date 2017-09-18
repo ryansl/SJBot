@@ -1,18 +1,18 @@
 from definitions import *
 
 """
-Grid positions for 1080p:
-    (1305, 100) to (1881, 676)
+Grid positions for 1440p:
+    (1740, 134) to (2508, 902)
 """
 
 class Configuration:
-    screen_width = 1920         # Width of computer screen
-    screen_height = 1080        # Height of computer screen
+    screen_width = 2560         # Width of computer screen
+    screen_height = 1440        # Height of computer screen
 
-    offset_x = 1305             # X offset of grid
-    offset_y = 100              # Y offset of grid
-    grid_size = 576             # Size of grid (square)
-    gem_size = 72               # Size of gem (square)
+    offset_x = 1740             # X offset of grid
+    offset_y = 134              # Y offset of grid
+    grid_size = 768             # Size of grid (square)
+    gem_size = 96               # Size of gem (square)
     grid_length = 8             # Number of gems from top-bottom or left-right
 
     idle_x = 675                # X offset for idle position
