@@ -25,7 +25,7 @@ def print_board(board):
     gs = Configuration.grid_length
     for y in range(1, gs + 1):
             for x in range(1, gs + 1):
-                print avg_board[(x, y)], 
+                print board[(x, y)], 
             print "\n"
             
 

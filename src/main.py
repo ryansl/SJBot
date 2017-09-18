@@ -49,7 +49,8 @@ def main(args):
 
     # Calibration mode?
     if Configuration.calibrating:
-        raw_input("Calibration Mode - Open SC2 window or image in fullscreen, then press Enter: \n")
+        print_debug("Calibration Mode - Open SC2 window or image in fullscreen, then wait 3 seconds:")
+        time.sleep(3)
         print_debug("Board color averages")
         print_board(reader.get_board(True))
         print_debug("Board color estimates")
@@ -71,6 +72,8 @@ def main(args):
 
         # Keep reading the board until we get an accurate representation of it
         benchmark.start("main")
+        benchmark.start("scan")
+
         board = reader.get_board()
         while Configuration.enabled and (board == None or board.num_unknowns > Configuration.unknown_threshold):
             board = reader.get_board()
@@ -78,17 +81,20 @@ def main(args):
 
 
         # Decide which moves to make and execute them
+        scan_time = benchmark.time("scan")
         benchmark.start("decision")
         move_set = Strategy(board).decide()
         decide_time = benchmark.time("decision")
         move_set.make()
         total_time = benchmark.time("main")
-        board = None
+        # board = None
 
 
         # Print benchmark information
         if Configuration.benchmark:
+            print_board(board)
             print_debug("Total time: %f" % (total_time))
+            print_debug("Scan time: %f" % (scan_time))
             print_debug("Decision time: %f" % (decide_time))
             print_debug("-----------------------")
 
